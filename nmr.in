@@ -1,0 +1,8 @@
+testdata2.dat #Name of NMR input file
+10000.0       #Baseline adjustment
+1e-10        #Tolerance for numerical algorithms
+2            #Type of Filter(0=none, 1=boxcar, 2=SG)
+11            #Size of boxcar or SG filter
+5            #Number of passes for the filter
+0            #Integration Technique (0=Adaptive, 1=Romberg, 2=Simpson, 3=Gaussian)
+analysis.txt #Name of output file
