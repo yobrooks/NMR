@@ -43,8 +43,7 @@ int main(int argc,char* argv[])
     cout << "Peak: " << peak << endl;
     
     //switch statement to turn on the correct filtering technique.  
-    switch(myAnalysis.filter)
-    {
+    switch(myAnalysis.filter){
       //if 0 is inputted, then no filtering occurs
       case 0:
         outputFile << "Filtering has been turned off." << endl;
@@ -59,7 +58,6 @@ int main(int argc,char* argv[])
           outputFile << "Boxcar Filtering " << endl;
           outputFile << "Boxcar Size (Cyclic): " << myAnalysis.sizeFilter << endl;
           outputFile << "Boxcar Passes       : " << myAnalysis.numPasses << endl;
-          
           //apply the boxcar filter using yFilter vector for the correct number of passes
           for(int i = 0; i <myAnalysis.numPasses; i++)
           {
@@ -67,28 +65,23 @@ int main(int argc,char* argv[])
           }
         }
         break;
-        
       /* Apply the SG filter*/
         case 2: 
-          
         outputFile << "Savitzy-Golay Filtering" << endl;
         outputFile << "Savitzy-Golay Size: " << myAnalysis.sizeFilter<< endl;
         outputFile << "Savitzy-Golay Passes: " << myAnalysis.numPasses << endl;
-        
         //if the SG filter size is 5
         if(myAnalysis.sizeFilter == 5){
           for(int i = 0; i<myAnalysis.numPasses; i++){
             sgFilter(35, SG5);
           }
         }
-        
         //if the filter size is 11
         else if(myAnalysis.sizeFilter == 11){
           for(int i = 0; i<myAnalysis.numPasses; i++){
            sgFilter(429, SG11);
            }
         }
-        
         //if the filter size is 17
         else if(myAnalysis.sizeFilter == 17){
           for(int i=0; i<myAnalysis.numPasses; i++){
