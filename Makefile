@@ -4,7 +4,7 @@
 #November 4, 2019
 
 CXX = g++
-CFLAGS = -std=c++11 -DDEBUG
+CFLAGS = -std=c++11
 LDLIBS = -lm -lgsl
 HEADERS = globals.h constants.h prototypes.h structs.h
 OBJS = integrals.o roots.o smooth.o read.o dft.o
