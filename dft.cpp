@@ -23,75 +23,11 @@ double computeNorm(gsl_vector_complex* a, gsl_vector_complex* b, int& N )
     B = pow(GSL_REAL(gsl_vector_complex_get(b,i)),2) + pow(GSL_IMAG(gsl_vector_complex_get(b,i)),2);
     A = sqrt(A);
     B = sqrt(B);
-    norm = max(norm, abs(A, B));
+    norm = max(norm, abs(A-B));
   }
   
   return norm;
 }  
-
-int iterativeSolver(int N)
-{
-  bool ok =false;
-  int success = 0;
-  gsl_vector_complex * X = gsl_vector_complex_alloc(N);
-  gsl_vector_complex * XO = gsl_vector_complex_calloc(N); //initialize vector of size and make all elements 0
-  gsl_complex result; gsl_complex mult;
-  
-  //STEP 1
-  int k = 1;
-  
-  //STEP 2
-   while(k<=N)
-   {
-   //STEP 3
-     for(int i=1; i<=N; i++)
-     {
-       result = gsl_complex_rect(0, 0);
-       for(int j=1; j<=n; j++)
-       {
-         if(j!=i)
-         {
-           mult = gsl_complex_mul(gsl_matrix_complex_get(Z, i-1, j-1), gsl_vector_complex_get(XO, j-1));
-           result = gsl_complex_add(result, mult);
-         }
-       }
-       result = gsl_complex_mul_real(result, -1.0);
-       result = gsl_complex_add(result, gsl_vector_complex_get(GC, i-1); 
-       result = gsl_complex_div(result, gsl_vector_complex_get(Z, i-1, i-1)
-       gsl_vector_complex_set(X, i-1, result);
-     }
-     
-     //STEP 4
-     if(computeNorm(X, XO, N) < TOL)
-     {
-       ok = true;
-       gsl_vector_complex_memcpy(X, Y);
-       break;
-     }
-     
-     //Step 5
-     k++;
-     
-     //Step 6
-     gsl_vector_complex_memcpy(XO, X);
-   } 
-   if(ok ==false)
-   {
-     success = 1;
-     inverseSolver();
-   }
-   return success;
-}
-
-void directSolver(gsl_matrix_complex* Z, gsl_vector_complex* GC, gsl_vector_complex* y, const int& n)
-{
-     
-    int s; 
-    gsl_permutation * p = gsl_permutation_alloc(n);
-    gsl_linalg_complex_LU_decomp(Z, p, &s);
-    gsl_linalg_complex_LU_solve(Z, p, GC, y);
-    gsl_permutation_free(p);
-}
 
 
 void inverseSolver(gsl_matrix_complex* Z, gsl_vector_complex* c, gsl_vector_complex* y, const int& n)
@@ -114,8 +50,75 @@ void inverseSolver(gsl_matrix_complex* Z, gsl_vector_complex* c, gsl_vector_comp
     gsl_matrix_complex_free(ZI);
 }
 
+int iterativeSolver(int N, gsl_matrix_complex* Z, gsl_vector_complex* GC, gsl_vector_complex* Y, double TOL, int MAX)
+{
+  bool ok =false;
+  int success = 0;
+  gsl_vector_complex * X = gsl_vector_complex_alloc(N);
+  gsl_vector_complex * XO = gsl_vector_complex_calloc(N); //initialize vector of size and make all elements 0
+  gsl_complex result; gsl_complex mult;
+  
+  //STEP 1
+  int k = 1;
+  
+  //STEP 2
+   while(k<=MAX)
+   {
+   //STEP 3
+     for(int i=1; i<=N; i++)
+     {
+       result = gsl_complex_rect(0, 0);
+       for(int j=1; j<=N; j++)
+       {
+         if(j!=i)
+         {
+           mult = gsl_complex_mul(gsl_matrix_complex_get(Z, i-1, j-1), gsl_vector_complex_get(XO, j-1));
+           result = gsl_complex_add(result, mult);
+         }
+       }
+       result = gsl_complex_mul_real(result, -1.0);
+       result = gsl_complex_add(result, gsl_vector_complex_get(GC, i-1)); 
+       result = gsl_complex_div(result, gsl_matrix_complex_get(Z, i-1, i-1));
+       gsl_vector_complex_set(X, i-1, result);
+     }
+     
+     //STEP 4
+     if(computeNorm(X, XO, N) < TOL)
+     {
+       ok = true;
+       gsl_vector_complex_memcpy(X, Y);
+       break;
+     }
+     
+     //Step 5
+     k++;
+     
+     //Step 6
+     gsl_vector_complex_memcpy(XO, X);
+   } 
+   if(ok ==false)
+   {
+     success = 1;
+     inverseSolver(Z, GC, Y, N);
+   }
+   
+   gsl_vector_complex_free(X);
+   gsl_vector_complex_free(XO);
+   return success;
+}
 
-void initializeGSL()
+void directSolver(gsl_matrix_complex* Z, gsl_vector_complex* GC, gsl_vector_complex* y, const int& n)
+{
+     
+    int s; 
+    gsl_permutation * p = gsl_permutation_alloc(n);
+    gsl_linalg_complex_LU_decomp(Z, p, &s);
+    gsl_linalg_complex_LU_solve(Z, p, GC, y);
+    gsl_permutation_free(p);
+}
+
+
+int initializeGSL()
 {
   //instantiate the vectors and matrices
     int n = myPoints.size();
@@ -176,7 +179,7 @@ void initializeGSL()
     //multiply G by c to get new coefficients
     gsl_vector_complex * GC = gsl_vector_complex_alloc(n);
     gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, G, c, GSL_COMPLEX_ZERO, GC);
-    
+    int var = 0;
     switch(myAnalysis.sizeFilter)
     {
       //apply inverse solver
@@ -187,16 +190,16 @@ void initializeGSL()
         directSolver(Z, GC, y, n);
         break;
       case 2:
-        iterativeSolver();
+        var = iterativeSolver(n , Z, GC, y, myAnalysis.tolerance, 25);
         break;
     }
     
     //load the y points in the gsl vector back into the regular vector
     //when filtering is complete
-    /*for(int i = 0; i < n; i++)
+    for(int i = 0; i < n; i++)
     {
-      myPoints[i] = gsl_vector_get(y, i);
-    }*/
+      myPoints[i].y = GSL_REAL(gsl_vector_complex_get(y,i)); 
+    }
     
     //free the vectors and matrices after being done with them
     gsl_vector_complex_free(y);
@@ -205,6 +208,7 @@ void initializeGSL()
     gsl_matrix_complex_free(G);
     gsl_matrix_complex_free(Z);
     
+    return var;
 }
 
 

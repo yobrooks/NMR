@@ -92,10 +92,16 @@ int main(int argc,char* argv[])
           outputFile<< "Invalid filter size for Savitzy-Golay Filtering entered. Valid filter sizes are 5, 11, and 17." << endl;
         break;
       case 3:
+        int temp = 0;
         outputFile << "Discrete Fourier Transform Filter" << endl;
-        initializeGSL();
+        temp = initializeGSL();
+        if(temp!=0)
+        {
+          outputFile << "Iterative Solver Exceeded Maximum Number of Iterations. Defaulting to Inverse Solver." << endl;
+        }
         break;
     }
+    cout << "Finish DFT" << endl;
     
     /*
     outputFile << "\nIntegration Method" << endl;
