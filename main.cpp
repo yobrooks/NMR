@@ -99,6 +99,7 @@ int main(int argc,char* argv[])
           outputFile<< "Invalid filter size for Savitzy-Golay Filtering entered. Valid filter sizes are 5, 11, and 17." << endl;
         break;
       case 3:
+        outputFile << "Discrete Fourier Transform Filter" << endl;
         initializeGSL();
         break;
     }

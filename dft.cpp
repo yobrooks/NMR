@@ -49,7 +49,7 @@ void initializeGSL()
     }
     
     //find the coefficients for vector c, by multiplying Z*y
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, Z, y, GSL_COMPLEX_ONE, c);
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, Z, y, GSL_COMPLEX_ZERO, c);
     
     //load the G matrix using equation 4 from project prompt
     double tempG = 0;
@@ -79,10 +79,31 @@ void initializeGSL()
     
     /* EQUATION 5 RETRIEVAL*/
     
-    /*DIRECT SOLVER--LU*/
+    //compute Z inverse by finding the complex conjugate of all the entries in Z
+    /* gsl_matrix_complex * ZI = gsl_matrix_complex_alloc(n, n);
+     gsl_complex tempZI;
+       for(int j = 0; j<n; j++)
+      {
+        for(int k = 0; k<n; k++)
+        {
+          tempZI = gsl_complex_conjugate(gsl_matrix_complex_get(Z, j, k));
+          gsl_matrix_complex_set(ZI, j, k, tempZI); 
+        }
+    }
+    
+    //retrieve the filtered y points by multiplying Zinverse by c
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, ZI, c, GSL_COMPLEX_ZERO, y);
+    
+    gsl_matrix_complex_free(ZI);*/
+    
+    /*DIRECT SOLVER--LU Decomposition*/
+    int s; 
+    gsl_permutation * p = gsl_permutation_alloc(n);
+    gsl_linalg_complex_LU_decomp(Z, p, &s);
+    gsl_linalg_complex_LU_solve(Z, p, c, y);
     
     /*ITERATIVE SOLVER--JACOBI*/
-    
+
     
     //load the y points in the gsl vector back into the regular vector
     //when filtering is complete
@@ -96,6 +117,7 @@ void initializeGSL()
     gsl_vector_complex_free(c);
     gsl_matrix_complex_free(G);
     gsl_matrix_complex_free(Z);
+    
 }
 
 #endif

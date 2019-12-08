@@ -1,5 +1,6 @@
 			-=> NMR ANALYSIS <=-
 Program Options
 +++++++++++++++++++++++++++++++
-Baseline Adjustment : 10000
+Baseline Adjustment : 2500
 Tolerance           : 1e-10
+Discrete Fourier Transform Filter
