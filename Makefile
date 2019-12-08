@@ -5,9 +5,9 @@
 
 CXX = g++
 CFLAGS = -std=c++11 -DDEBUG
-LDLIBS = -lm
+LDLIBS = -lm -lgsl
 HEADERS = globals.h constants.h prototypes.h structs.h
-OBJS = integrals.o roots.o smooth.o read.o
+OBJS = integrals.o roots.o smooth.o read.o dft.o
 
 debug ?= n
 ifeq ($(debug), y)
@@ -35,6 +35,9 @@ smooth.o : smooth.cpp $(HEADERS)
  
 read.o : read.cpp $(HEADERS)
 	$(CXX) $(CFLAGS) read.cpp -c
+
+dft.o : dft.cpp $(HEADERS)
+	$(CXX) $(CFLAGS) dft.cpp -c
   
 clean:
 	rm *.o

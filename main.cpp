@@ -98,9 +98,12 @@ int main(int argc,char* argv[])
         else
           outputFile<< "Invalid filter size for Savitzy-Golay Filtering entered. Valid filter sizes are 5, 11, and 17." << endl;
         break;
+      case 3:
+        initializeGSL();
+        break;
     }
     
-    
+    /*
     outputFile << "\nIntegration Method" << endl;
     outputFile << "+++++++++++++++++++++++++++++++" << endl;
     //switch statement to print the appropriate integration technique
@@ -142,7 +145,7 @@ int main(int argc,char* argv[])
       cout << "for loop " << endl;
       cout << roots.size() << endl;
       outputFile << i+1 << roots[i*2].x << roots[i*2+1].x << roots[i*2+1].x-(roots[i*2].x/2) << areas[i] << int(areas[i]/minInt) << endl;
-    }
+    }*/
     
     outputFile.close();
 }

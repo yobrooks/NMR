@@ -21,5 +21,6 @@ double adQuad(double a, double b, double tol, int n, int x);
 double guassLeg(double a, double b, int x);
 void readInNMR(string filename);
 void readInData();
+void initializeGSL();
 double performIntegration(int key); //returns the minimum integral
 #endif

@@ -3,22 +3,3 @@ Program Options
 +++++++++++++++++++++++++++++++
 Baseline Adjustment : 10000
 Tolerance           : 1e-10
-Savitzy-Golay Filtering
-Savitzy-Golay Size: 11
-Savitzy-Golay Passes: 5
-
-Integration Method
-+++++++++++++++++++++++++++++++
-Adaptive Quadrature
-
-Plot File Data
-++++++++++++++++++++++++++++++++
-File : testdata2.dat
-Plot Shifted 10.1603 ppm for this TMS calibration
-
-
-PeakBeginEndLocationAreaHydrogens
-1-5.4444-5.52618-2.803983.30302e+090
-3-7.77462-7.78703-3.89972-4.12284e+111
-5-8.21161-8.29421-4.18844.056010
-7-10.1516-10.1655-5.089659.99502e-3100
