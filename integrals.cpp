@@ -235,7 +235,7 @@ double performIntegration(int key)
       
     //Romberg Method
     case 1:
-      for(int i = 0; i < (roots.size()/2); i=i+2)
+      for(int i = 0; i < (roots.size()/2); i++)
       {
         integral = romberg(roots[i*2].x, roots[i*2+1].x, 5, (posRoots[i*2]/10));
         areas.push_back(integral);
@@ -248,15 +248,15 @@ double performIntegration(int key)
       
     //Simpson's Method
     case 2:
-      for(int i = 0; i < (roots.size()/2); i=i+2)
+       for(int i = roots.size()-1; i > 0; i=i-2)
+      {
+        integral = simpson(roots[i].x, roots[i-1].x, 10, (posRoots[i]/10));
+        areas.push_back(integral);
+        if(integral<minIntegral)
         {
-          integral = simpson(roots[i*2].x, roots[i*2+1].x, 10, (posRoots[i*2]/10));
-          areas.push_back(integral);
-          if(integral<minIntegral)
-          {
-            minIntegral = integral;
-          }
+          minIntegral = integral;
         }
+      }
       break;
       
     //Gaussian Quadrature

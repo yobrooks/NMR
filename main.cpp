@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <iomanip> 
 #include <string>
 #include "prototypes.h"
 #include "structs.h"
@@ -92,7 +93,7 @@ int main(int argc,char* argv[])
           outputFile<< "Invalid filter size for Savitzy-Golay Filtering entered. Valid filter sizes are 5, 11, and 17." << endl;
         break;
       case 3:
-        int temp = 0;
+        int temp;
         outputFile << "Discrete Fourier Transform Filter" << endl;
         temp = initializeGSL();
         if(temp!=0)
@@ -100,10 +101,10 @@ int main(int argc,char* argv[])
           outputFile << "Iterative Solver Exceeded Maximum Number of Iterations. Defaulting to Inverse Solver." << endl;
         }
         break;
+      default:
+        outputFile << "Invalid Filter Option" << endl; 
     }
-    cout << "Finish DFT" << endl;
     
-    /*
     outputFile << "\nIntegration Method" << endl;
     outputFile << "+++++++++++++++++++++++++++++++" << endl;
     //switch statement to print the appropriate integration technique
@@ -128,7 +129,8 @@ int main(int argc,char* argv[])
     outputFile << "File : " << myAnalysis.inputFile << endl;
     outputFile << "Plot Shifted " << peak << " ppm for this TMS calibration\n\n" << endl;
     
-    outputFile << "Peak" << "Begin" << "End"<< "Location" << "Area" << "Hydrogens" << endl;
+    outputFile << "Peak"<< setw(17) << "Begin" << setw(20) << "End"<< setw(20) << "Location" << setw(20) <<"Area" << setw(20) << "Hydrogens" << endl;
+    outputFile << "+++++++   +++++++++++++++++   +++++++++++++++++   +++++++++++++++++   +++++++++++++++++   +++++++++++++++++" << endl;  
     
     //perform cubic spline
     cubicSpline(myPoints.size());
@@ -138,14 +140,12 @@ int main(int argc,char* argv[])
     cout << "found intersect" << endl;
     double minInt = 0;
     minInt = performIntegration(myAnalysis.typeIntegration); //returns the smallest area
-    cout << "found integration" << endl;
-    cout << "AREAS IN MAIN: " << areas.size() << endl;
-    for(int i = 0; i < (roots.size()/2); i=i+2)
+    int count =1;
+    for(int i = roots.size()-1; i > 0; i=i-2)
     {
-      cout << "for loop " << endl;
-      cout << roots.size() << endl;
-      outputFile << i+1 << roots[i*2].x << roots[i*2+1].x << roots[i*2+1].x-(roots[i*2].x/2) << areas[i] << int(areas[i]/minInt) << endl;
-    }*/
+      outputFile << setw(3) << count << setw(20) << roots[i].x<< setw(20) << roots[i-1].x << setw(20)<< (roots[i-1].x+roots[i].x)/2<< setw(20) << areas[count-1] << setw(20)<< int(areas[i/2]/minInt) << endl;
+      count++;
+    }
     
     outputFile.close();
 }
