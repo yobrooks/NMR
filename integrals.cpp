@@ -67,48 +67,50 @@ double summation(int i, double a, double h, int x)
     return result;
 }
 
-//CHECK THIS ONE TO MAKE SURE NO SEG FAULT
+
 //Romberg Integration method from algorithm 4.2 in the book
 double romberg(double a, double b, int n, int x)
 {
     //vector with n rows and n columns
-   vector<vector<double> > R(n, vector<double>(n)); //vector with n rows and n columns
+    vector<vector<double> > R(3, vector<double>(n+1)); //vector with n rows and n columns
     //STEP 1
-    /*double h = b-a;
-    R[0][0] = (h/2)*(myFunc(a, x) + myFunc(b, x));
+    double h = b-a;
+    R[1][1] = (h/2)*(myFunc(a, x) + myFunc(b, x));
 
     //STEP 2
-    //cout << "R11: " << R[0][0] << endl;
+    //cout << "R11: " << R[1][1] << endl;
 
     //STEP 3
-    for(int i=2; i<=n;i++)
+    for(int i=2; i<n+1;i++)
     {
         //STEP 4
-        R[1][0] = (0.5)*(R[0][0] + (h*summation(i, a, h)));
+        R[2][1] = (0.5)*(R[1][1] + (h*summation(i, a, h, x)));
 
         //STEP 5
-        for(int j=1; j<=i; j++)
+        for(int j=2; j<i+1; j++)
         {
-            R[1][j] = R[1][j-1]+ ((R[1][j-1]-R[0][j-1])/(pow(4, j-1)-1));
+            R[2][j] = R[2][j-1]+ ((R[2][j-1]-R[1][j-1])/(pow(4, j-1)-1));
         }
 
         //STEP 6
-        for(int j=0; j<=i; j++)
+        for(int j=1; j<i+1; j++)
         {
-          //  cout << "R2" << j << ": " << R[1][j]<< endl;
+          //  cout << "R2" << j << ": " << R[2][j]<< endl;
         }
 
         //STEP 7
         h=h/2;
 
         //STEP 8
-        for(int j=0; j<=i; j++)
+        for(int j=1; j<i+1; j++)
         {
             R[1][j] = R[2][j];
+            //cout << R[1][j] << endl;
         }
-    }*/
+    }
 
-    return R[n-1][n-1];
+    return R[1][n-1];
+
 }
 
 double adQuad(double a, double b, double tol, int n, int x)
