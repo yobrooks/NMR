@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iomanip> 
 #include <string>
+#include <time.h>
 #include "prototypes.h"
 #include "structs.h"
 #include "globals.h"
@@ -21,15 +22,14 @@ vector<int> SG17 = {-21, -6, 7, 18, 27, 34, 39, 42, 43, 42, 39, 34, 27, 18, 7, -
 
 int main(int argc,char* argv[])
 {
-
+  clock_t time;
+  time = clock();
     string fileName;
     ofstream outputFile; 
     
     //read in the input file (nmr.in)
     readInNMR("nmr.in");
     readInData();
-    
-    cout << "Original Size of vector: " << myPoints.size() << endl;
     
     //open up an output file to output values to for the summary
     //output the beginning few lines of the summary
@@ -41,7 +41,6 @@ int main(int argc,char* argv[])
     outputFile << "Tolerance           : " << myAnalysis.tolerance << endl;
     
     double peak = findTMS();
-    cout << "Peak: " << peak << endl;
     
     //switch statement to turn on the correct filtering technique.  
     switch(myAnalysis.filter){
@@ -95,6 +94,18 @@ int main(int argc,char* argv[])
       case 3:
         int temp;
         outputFile << "Discrete Fourier Transform Filter" << endl;
+        if(myAnalysis.sizeFilter == 0)
+        {
+          outputFile << "Inverse Solver" << endl;
+        }
+        else if(myAnalysis.sizeFilter == 1)
+        {
+          outputFile << "Direct Solver" << endl;
+        }
+        else if(myAnalysis.sizeFilter == 2)
+        {
+          outputFile << "Iterative Solver" << endl;
+        }
         temp = initializeGSL();
         if(temp!=0)
         {
@@ -102,7 +113,7 @@ int main(int argc,char* argv[])
         }
         break;
       default:
-        outputFile << "Invalid Filter Option" << endl; 
+        outputFile << "Invalid Filter Option Entered" << endl; 
     }
     
     outputFile << "\nIntegration Method" << endl;
@@ -122,6 +133,8 @@ int main(int argc,char* argv[])
       case 3:
         outputFile << "Gaussian-Legendre Quadrature" << endl; 
         break;
+      default:
+        outputFile << "Invalid Integration Method Entered" << endl;
     } 
     
     outputFile << "\nPlot File Data" << endl;
@@ -137,7 +150,6 @@ int main(int argc,char* argv[])
    
     //find the roots
     findIntersect();
-    cout << "found intersect" << endl;
     double minInt = 0;
     minInt = performIntegration(myAnalysis.typeIntegration); //returns the smallest area
     int count =1;
@@ -146,7 +158,9 @@ int main(int argc,char* argv[])
       outputFile << setw(3) << count << setw(20) << roots[i].x<< setw(20) << roots[i-1].x << setw(20)<< (roots[i-1].x+roots[i].x)/2<< setw(20) << areas[count-1] << setw(20)<< int(areas[i/2]/minInt) << endl;
       count++;
     }
-    
+    time = clock() - time;
+    outputFile << "\nAnalysis took " << ((float)time)/CLOCKS_PER_SEC << " seconds. " << endl;
+    cout << "NMR Finished Processing. To see NMR Analysis visit the " << myAnalysis.outputFile <<  " file." << endl;
     outputFile.close();
 }
 #endif

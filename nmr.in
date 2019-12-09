@@ -4,5 +4,5 @@ testdata2.dat #Name of NMR input file
 3             #Type of Filter(0=none, 1=boxcar, 2=SG, 3=DFT)
 0             #Size of boxcar or SG filter, or DFT (0=inverse, 1=direct, 2=iterative)
 5             #Number of passes for the filter (Ignored if filter is 0 or 3)
-1             #Integration Technique (0=Adaptive, 1=Romberg, 2=Simpson, 3=Gaussian)
+0             #Integration Technique (0=Adaptive, 1=Romberg, 2=Simpson, 3=Gaussian)
 analysis.txt  #Name of output file

@@ -18,7 +18,7 @@ double simpson(double a, double b, int n, int x);
 double summation(int i, double a, double h, int x);
 double romberg(double a, double b, int n, int x);
 double adQuad(double a, double b, double tol, int n, int x);
-double guassLeg(double a, double b, int x);
+double gaussLeg(double a, double b, int x);
 void readInNMR(string filename);
 void readInData();
 int initializeGSL();

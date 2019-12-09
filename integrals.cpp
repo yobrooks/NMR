@@ -27,7 +27,6 @@ double simpson(double a, double b, int n, int x)
     double result = 0;
     //STEP 1
     double h = (b-a)/n;
-    cout << "H: " << h << endl;
 
     //STEP 2
     XI.push_back(myFunc(a, x) + myFunc(b, x)); //XI0 
@@ -77,8 +76,6 @@ double romberg(double a, double b, int n, int x)
     double h = b-a;
     R[1][1] = (h/2)*(myFunc(a, x) + myFunc(b, x));
 
-    //STEP 2
-    //cout << "R11: " << R[1][1] << endl;
 
     //STEP 3
     for(int i=2; i<n+1;i++)
@@ -92,12 +89,6 @@ double romberg(double a, double b, int n, int x)
             R[2][j] = R[2][j-1]+ ((R[2][j-1]-R[1][j-1])/(pow(4, j-1)-1));
         }
 
-        //STEP 6
-        for(int j=1; j<i+1; j++)
-        {
-          //  cout << "R2" << j << ": " << R[2][j]<< endl;
-        }
-
         //STEP 7
         h=h/2;
 
@@ -105,10 +96,8 @@ double romberg(double a, double b, int n, int x)
         for(int j=1; j<i+1; j++)
         {
             R[1][j] = R[2][j];
-            //cout << R[1][j] << endl;
         }
     }
-
     return R[1][n-1];
 
 }
@@ -160,7 +149,6 @@ double adQuad(double a, double b, double tol, int n, int x)
        else{
            if(v[8]>=n)
            {
-               cout << "Level Exceeded" << endl;
                break;
            }
            else{
@@ -188,6 +176,7 @@ double adQuad(double a, double b, double tol, int n, int x)
    }
 
    //STEP 6
+
    return APP;
 
 }
@@ -206,45 +195,61 @@ double gaussLeg(double a, double b, int x)
         result = result + c[i]*myFunc(funcMath, x)*((b-a)/2.0);
     }
     return result;
+    
 }
 
 double performIntegration(int key)
 {
 
-//NEED TO ADJUST FOR THE YVALUES THAT ARE NOT ABOVE 0
+
   double integral = 0;
   double minIntegral = 100000; 
+  double position = 0;
   
-  //need to find the first and last place where the spline is above the baseline
+
   switch(key){ 
   
     //Adaptive Quad
     case 0:
     //MAY NEED TO CHANGE THIS TO GO FROM END OF ROOTS TO BEGINNING
     //iterate through the roots, add the integral to the areas vector, find the minimum integral for the hydrogen
-      for(int i = 0; i < (roots.size()/2); i=i+2)
+       for(int i = roots.size()-1; i > 0; i=i-2)
       {
-        integral = adQuad(roots[i*2].x, roots[i*2+1].x, myAnalysis.tolerance, 10, (posRoots[i*2]/10));
-        cout << "INTEGRAL: " << integral << endl;
-        areas.push_back(integral);
-        if(integral<minIntegral)
-        {
-          minIntegral = integral;
-        }
+          position = posRoots[i]/10; 
+          integral = adQuad(roots[i].x-myPoints[position].x, splinePoints[posRoots[i]-1].x-myPoints[position].x, myAnalysis.tolerance, 10, position);
+          for (int j=posRoots[i]-1;j>posRoots[i-1]+1;j--)
+          {
+            position = j/10;
+            integral = integral + adQuad(splinePoints[j].x-myPoints[position].x,splinePoints[j-1].x-myPoints[position].x, myAnalysis.tolerance, 10, position);  
+          }
+          position = (posRoots[i-1]+1)/10;
+          integral = integral + adQuad(splinePoints[posRoots[i-1]+1].x-myPoints[position].x,roots[i-1].x-myPoints[position].x, myAnalysis.tolerance, 10, position);
+          areas.push_back(integral);
+          if(integral<minIntegral)
+          {
+            minIntegral = integral;
+          }
       }
-      cout << "AREAS IN PERFORMINT...: "<< areas.size() << endl;
-      break;
-      
+        break;
+        
     //Romberg Method
     case 1:
-      for(int i = 0; i < (roots.size()/2); i++)
+       for(int i = roots.size()-1; i > 0; i=i-2)
       {
-        integral = romberg(roots[i*2].x, roots[i*2+1].x, 5, (posRoots[i*2]/10));
-        areas.push_back(integral);
-        if(integral<minIntegral)
-        {
-          minIntegral = integral;
-        }
+          position = posRoots[i]/10; 
+          integral = romberg(roots[i].x-myPoints[position].x, splinePoints[posRoots[i]-1].x-myPoints[position].x, 5, position);
+          for (int j=posRoots[i]-1;j>posRoots[i-1]+1;j--)
+          {
+            position = j/10;
+            integral = integral + romberg(splinePoints[j].x-myPoints[position].x,splinePoints[j-1].x-myPoints[position].x, 5, position);  
+          }
+          position = (posRoots[i-1]+1)/10;
+          integral = integral + romberg(splinePoints[posRoots[i-1]+1].x-myPoints[position].x,roots[i-1].x-myPoints[position].x, 5, position);
+          areas.push_back(integral);
+          if(integral<minIntegral)
+          {
+            minIntegral = integral;
+          }
       }
       break;
       
@@ -252,25 +257,41 @@ double performIntegration(int key)
     case 2:
        for(int i = roots.size()-1; i > 0; i=i-2)
       {
-        integral = simpson(roots[i].x, roots[i-1].x, 10, (posRoots[i]/10));
-        areas.push_back(integral);
-        if(integral<minIntegral)
-        {
-          minIntegral = integral;
-        }
+          position = posRoots[i]/10; 
+          integral = simpson(roots[i].x-myPoints[position].x, splinePoints[posRoots[i]-1].x-myPoints[position].x, 10, position);
+          for (int j=posRoots[i]-1;j>posRoots[i-1]+1;j--)
+          {
+            position = j/10;
+            integral = integral + simpson(splinePoints[j].x-myPoints[position].x,splinePoints[j-1].x-myPoints[position].x, 10, position);  
+          }
+          position = (posRoots[i-1]+1)/10;
+          integral = integral + simpson(splinePoints[posRoots[i-1]+1].x-myPoints[position].x,roots[i-1].x-myPoints[position].x, 10, position);
+          areas.push_back(integral);
+          if(integral<minIntegral)
+          {
+            minIntegral = integral;
+          }
       }
       break;
       
     //Gaussian Quadrature
     case 3:
-      for(int i = 0; i < (roots.size()/2); i=i+2)
+     for(int i = roots.size()-1; i > 0; i=i-2)
       {
-        integral = gaussLeg(roots[i*2].x, roots[i*2+1].x, (posRoots[i*2]/10));
-        areas.push_back(integral);
-        if(integral<minIntegral)
-        {
-          minIntegral = integral;
-        }
+          position = posRoots[i]/10; 
+          integral = gaussLeg(roots[i].x-myPoints[position].x, splinePoints[posRoots[i]-1].x-myPoints[position].x, position);
+          for (int j=posRoots[i]-1;j>posRoots[i-1]+1;j--)
+          {
+            position = j/10;
+            integral = integral + gaussLeg(splinePoints[j].x-myPoints[position].x,splinePoints[j-1].x-myPoints[position].x, position);  
+          }
+          position = (posRoots[i-1]+1)/10;
+          integral = integral + gaussLeg(splinePoints[posRoots[i-1]+1].x-myPoints[position].x,roots[i-1].x-myPoints[position].x, position);
+          areas.push_back(integral);
+          if(integral<minIntegral)
+          {
+            minIntegral = integral;
+          }
       }
       break;
   }
